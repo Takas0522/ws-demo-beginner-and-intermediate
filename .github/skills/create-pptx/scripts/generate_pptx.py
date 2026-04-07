@@ -61,17 +61,45 @@ def add_accent_bar(slide, left, top, width, height, color=ACCENT):
 def add_text_box(slide, left, top, width, height, text, font_size=18,
                  color=TEXT_PRIMARY, bold=False, alignment=PP_ALIGN.LEFT,
                  font_name=FONT_NAME):
+    from pptx.util import Pt as _Pt
+    from pptx.oxml.ns import qn
+    from lxml import etree
+
     txBox = slide.shapes.add_textbox(left, top, width, height)
     tf = txBox.text_frame
     tf.word_wrap = True
-    tf.auto_size = None
-    p = tf.paragraphs[0]
-    p.text = text
-    p.font.name = font_name
-    p.font.size = Pt(font_size)
-    p.font.color.rgb = color
-    p.font.bold = bold
-    p.alignment = alignment
+
+    # テキストフレームに内部余白を設定
+    txBox.text_frame.margin_left   = Pt(2)
+    txBox.text_frame.margin_right  = Pt(2)
+    txBox.text_frame.margin_top    = Pt(2)
+    txBox.text_frame.margin_bottom = Pt(2)
+
+    lines = text.split('\n') if text else ['']
+    for i, line in enumerate(lines):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        run = p.add_run()
+        run.text = line
+        run.font.name = font_name
+        run.font.size = _Pt(font_size)
+        run.font.color.rgb = color
+        run.font.bold = bold
+        p.alignment = alignment
+
+        # 段落間スペース（空行は半分）
+        pPr = p._pPr if p._pPr is not None else p._p.get_or_add_pPr()
+        space_after = int(_Pt(font_size * 0.15))
+        pPr.set('spc', str(int(_Pt(font_size * 0.15))))
+
+        # 行間を1.1倍に設定
+        lnSpc = pPr.find(qn('a:lnSpc'))
+        if lnSpc is None:
+            lnSpc = etree.SubElement(pPr, qn('a:lnSpc'))
+        spcPct = lnSpc.find(qn('a:spcPct'))
+        if spcPct is None:
+            spcPct = etree.SubElement(lnSpc, qn('a:spcPct'))
+        spcPct.set('val', '110000')
+
     return txBox
 
 
@@ -138,8 +166,8 @@ def create_content_slide(prs, data):
     set_slide_bg(slide)
 
     add_header_bar(slide, data.get("title", ""))
-    add_text_box(slide, Inches(0.8), Inches(1.8), Inches(11.5), Inches(5),
-                 data.get("body", ""), font_size=20)
+    add_text_box(slide, Inches(0.8), Inches(1.55), Inches(11.7), Inches(5.3),
+                 data.get("body", ""), font_size=18)
     add_footer_line(slide, data.get("footer"))
     return slide
 
@@ -151,20 +179,20 @@ def create_two_column_slide(prs, data):
     add_header_bar(slide, data.get("title", ""))
 
     # 左カラム
-    add_shape(slide, Inches(0.6), Inches(1.8), Inches(5.6), Inches(4.8), BG_SURFACE)
-    add_accent_bar(slide, Inches(0.6), Inches(1.8), Inches(5.6), Inches(0.04), ACCENT)
-    add_text_box(slide, Inches(1.0), Inches(2.2), Inches(4.8), Inches(0.6),
-                 data.get("left_heading", ""), font_size=22, bold=True)
-    add_text_box(slide, Inches(1.0), Inches(3.0), Inches(4.8), Inches(3.2),
-                 data.get("left_body", ""), font_size=16, color=TEXT_SECONDARY)
+    add_shape(slide, Inches(0.5), Inches(1.55), Inches(6.1), Inches(5.3), BG_SURFACE)
+    add_accent_bar(slide, Inches(0.5), Inches(1.55), Inches(6.1), Inches(0.05), ACCENT)
+    add_text_box(slide, Inches(0.85), Inches(1.75), Inches(5.4), Inches(0.65),
+                 data.get("left_heading", ""), font_size=20, bold=True)
+    add_text_box(slide, Inches(0.85), Inches(2.55), Inches(5.4), Inches(4.0),
+                 data.get("left_body", ""), font_size=15, color=TEXT_SECONDARY)
 
     # 右カラム
-    add_shape(slide, Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8), BG_SURFACE)
-    add_accent_bar(slide, Inches(6.8), Inches(1.8), Inches(5.6), Inches(0.04), ACCENT2)
-    add_text_box(slide, Inches(7.2), Inches(2.2), Inches(4.8), Inches(0.6),
-                 data.get("right_heading", ""), font_size=22, bold=True)
-    add_text_box(slide, Inches(7.2), Inches(3.0), Inches(4.8), Inches(3.2),
-                 data.get("right_body", ""), font_size=16, color=TEXT_SECONDARY)
+    add_shape(slide, Inches(6.9), Inches(1.55), Inches(6.1), Inches(5.3), BG_SURFACE)
+    add_accent_bar(slide, Inches(6.9), Inches(1.55), Inches(6.1), Inches(0.05), ACCENT2)
+    add_text_box(slide, Inches(7.25), Inches(1.75), Inches(5.4), Inches(0.65),
+                 data.get("right_heading", ""), font_size=20, bold=True)
+    add_text_box(slide, Inches(7.25), Inches(2.55), Inches(5.4), Inches(4.0),
+                 data.get("right_body", ""), font_size=15, color=TEXT_SECONDARY)
 
     add_footer_line(slide)
     return slide
@@ -182,16 +210,16 @@ def create_three_cards_slide(prs, data):
     for i in range(min(len(cards), 3)):
         card = cards[i]
         color = accent_colors[i % 3]
-        x = Inches(0.6 + i * 4.2)
+        x = Inches(0.5 + i * 4.28)
 
-        add_shape(slide, x, Inches(1.8), Inches(3.8), Inches(4.6), BG_SURFACE)
-        add_accent_bar(slide, x, Inches(1.8), Inches(3.8), Inches(0.05), color)
-        add_text_box(slide, x + Inches(0.4), Inches(2.2), Inches(1.5), Inches(0.8),
-                     card.get("number", f"{i+1:02d}"), font_size=40, bold=True, color=color)
-        add_text_box(slide, x + Inches(0.4), Inches(3.2), Inches(3), Inches(0.6),
-                     card.get("heading", ""), font_size=22, bold=True)
-        add_text_box(slide, x + Inches(0.4), Inches(4.0), Inches(3), Inches(2),
-                     card.get("body", ""), font_size=14, color=TEXT_SECONDARY)
+        add_shape(slide, x, Inches(1.55), Inches(3.9), Inches(5.3), BG_SURFACE)
+        add_accent_bar(slide, x, Inches(1.55), Inches(3.9), Inches(0.06), color)
+        add_text_box(slide, x + Inches(0.3), Inches(1.85), Inches(1.5), Inches(0.9),
+                     card.get("number", f"{i+1:02d}"), font_size=44, bold=True, color=color)
+        add_text_box(slide, x + Inches(0.3), Inches(2.85), Inches(3.3), Inches(0.65),
+                     card.get("heading", ""), font_size=20, bold=True)
+        add_text_box(slide, x + Inches(0.3), Inches(3.65), Inches(3.3), Inches(3.0),
+                     card.get("body", ""), font_size=15, color=TEXT_SECONDARY)
 
     add_footer_line(slide)
     return slide
@@ -255,15 +283,20 @@ def create_table_slide(prs, data):
     col_count = len(headers) if headers else (len(rows[0]) if rows else 1)
     row_count = len(rows) + 1  # +1 for header
 
-    table_left = Inches(0.6)
-    table_top = Inches(1.8)
-    table_width = Inches(12.0)
-    table_height = Inches(4.8)
+    table_left   = Inches(0.5)
+    table_top    = Inches(1.55)
+    table_width  = Inches(12.3)
+    row_h        = Inches(max(0.42, 4.8 / row_count))
+    table_height = row_h * row_count
 
     table_shape = slide.shapes.add_table(row_count, col_count,
                                          table_left, table_top,
-                                         table_width, table_height)
+                                         table_width, int(table_height))
     table = table_shape.table
+
+    # 行高を均等に設定
+    for ri in range(row_count):
+        table.rows[ri].height = int(row_h)
 
     # ヘッダー行スタイル
     for ci, header_text in enumerate(headers):
@@ -271,29 +304,30 @@ def create_table_slide(prs, data):
         cell.text = str(header_text)
         for paragraph in cell.text_frame.paragraphs:
             paragraph.font.name = FONT_NAME
-            paragraph.font.size = Pt(14)
+            paragraph.font.size = Pt(13)
             paragraph.font.bold = True
             paragraph.font.color.rgb = TEXT_PRIMARY
         cell.fill.solid()
-        cell.fill.fore_color.rgb = RGBColor(0x00, 0x7A, 0xC2)  # ヘッダー青
+        cell.fill.fore_color.rgb = RGBColor(0x00, 0x6A, 0xAA)
+        cell.vertical_anchor = MSO_ANCHOR.MIDDLE
 
     # データ行スタイル
     for ri, row_data in enumerate(rows):
+        bg = BG_SURFACE if ri % 2 == 0 else RGBColor(0x22, 0x22, 0x34)
         for ci, cell_text in enumerate(row_data):
             cell = table.cell(ri + 1, ci)
             cell.text = str(cell_text)
             for paragraph in cell.text_frame.paragraphs:
                 paragraph.font.name = FONT_NAME
-                paragraph.font.size = Pt(13)
+                paragraph.font.size = Pt(12)
                 paragraph.font.color.rgb = TEXT_PRIMARY
             cell.fill.solid()
-            cell.fill.fore_color.rgb = BG_SURFACE if ri % 2 == 0 else BG_DARK
+            cell.fill.fore_color.rgb = bg
+            cell.vertical_anchor = MSO_ANCHOR.MIDDLE
 
     # テーブル罫線
     from pptx.oxml.ns import qn
-    tbl = table._tbl
-    tbl_pr = tbl.tblPr if tbl.tblPr is not None else tbl._add_tblPr()
-    # 罫線の色設定
+    from lxml import etree
     for row in table.rows:
         for cell in row.cells:
             tc = cell._tc
@@ -301,17 +335,14 @@ def create_table_slide(prs, data):
             for border_name in ['a:lnL', 'a:lnR', 'a:lnT', 'a:lnB']:
                 ln = tc_pr.find(qn(border_name))
                 if ln is None:
-                    from lxml import etree
-                    ln = etree.SubElement(tc_pr, qn(border_name), w='12700', cap='flat', cmpd='sng')
+                    ln = etree.SubElement(tc_pr, qn(border_name), w='9525', cap='flat', cmpd='sng')
                 else:
-                    ln.set('w', '12700')
+                    ln.set('w', '9525')
                 sf = ln.find(qn('a:solidFill'))
                 if sf is None:
-                    from lxml import etree
                     sf = etree.SubElement(ln, qn('a:solidFill'))
                 srgb = sf.find(qn('a:srgbClr'))
                 if srgb is None:
-                    from lxml import etree
                     srgb = etree.SubElement(sf, qn('a:srgbClr'))
                 srgb.set('val', '3A3A4E')
 
