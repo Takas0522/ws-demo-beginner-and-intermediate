@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>勤怠管理システム</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+
+    /* ===== Login ===== */
+    .login-wrapper {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      padding: 48px 40px;
+      width: 360px;
+    }
+    .login-wrapper h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+      color: #1a1a2e;
+    }
+    .login-wrapper p.subtitle {
+      font-size: 13px;
+      color: #888;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #555;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus {
+      border-color: #4f6ef7;
+    }
+    .error-msg {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 11px;
+      background: #4f6ef7;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #3a57e0; }
+    .btn-primary:active { transform: scale(0.98); }
+    .hint {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #aaa;
+      text-align: center;
+    }
+
+    /* ===== Dashboard ===== */
+    .dashboard {
+      width: 900px;
+      max-width: 98vw;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      margin-bottom: 20px;
+    }
+    .top-bar .brand { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+    .top-bar .user-info { font-size: 13px; color: #666; }
+    .btn-logout {
+      padding: 7px 16px;
+      background: #fff;
+      border: 1.5px solid #ddd;
+      border-radius: 7px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #555;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { background: #f5f5f5; }
+
+    /* stamp card */
+    .stamp-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      padding: 28px 28px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .stamp-card .today-label {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .stamp-card .today-date {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+    .stamp-times {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      flex: 1;
+    }
+    .stamp-time-block {
+      text-align: center;
+    }
+    .stamp-time-block .label {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .stamp-time-block .time-val {
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      min-width: 80px;
+      letter-spacing: 1px;
+    }
+    .stamp-time-block .time-val.empty { color: #ccc; }
+
+    .stamp-buttons {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+    .btn-checkin {
+      padding: 12px 28px;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn-checkin:hover { background: #219a52; }
+    .btn-checkin:disabled { background: #a8d5b5; cursor: not-allowed; }
+    .btn-checkout {
+      padding: 12px 28px;
+      background: #e67e22;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn-checkout:hover { background: #cf6d17; }
+    .btn-checkout:disabled { background: #f0c898; cursor: not-allowed; }
+
+    /* table */
+    .table-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      padding: 24px 28px;
+    }
+    .table-card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #1a1a2e;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #f7f8fc;
+      color: #666;
+      font-weight: 600;
+      border-bottom: 2px solid #eee;
+    }
+    tbody tr {
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: #fafbff; }
+    tbody tr.today-row { background: #eef2ff; }
+    tbody tr.today-row td { font-weight: 600; }
+    tbody td {
+      padding: 10px 14px;
+      color: #333;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-present { background: #d4f0e0; color: #1a7a40; }
+    .badge-absent  { background: #fdecea; color: #b71c1c; }
+    .badge-holiday { background: #e8eaf6; color: #3949ab; }
+    .badge-today   { background: #fff3e0; color: #e65100; }
+    .hours-cell { color: #4f6ef7; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // ===== 定数 =====
+    const FIXED_ID   = 'user01';
+    const FIXED_PASS = 'pass1234';
+
+    // 日本時間の現在時刻を HH:MM 形式で返す
+    function nowJST() {
+      return new Date().toLocaleTimeString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    }
+
+    // 勤務時間を計算 (HH:MM, HH:MM) → "X時間Y分" or null
+    function calcHours(checkIn, checkOut) {
+      if (!checkIn || !checkOut) return null;
+      const [ih, im] = checkIn.split(':').map(Number);
+      const [oh, om] = checkOut.split(':').map(Number);
+      const diff = (oh * 60 + om) - (ih * 60 + im);
+      if (diff <= 0) return null;
+      return `${Math.floor(diff / 60)}h${String(diff % 60).padStart(2, '0')}m`;
+    }
+
+    // ===== ダミー打刻データ (2026/4/1〜4/9) =====
+    const initialAttendance = [
+      { date: '2026/04/01', day: '水', checkIn: '09:01', checkOut: '18:05', status: 'present' },
+      { date: '2026/04/02', day: '木', checkIn: '08:58', checkOut: '17:52', status: 'present' },
+      { date: '2026/04/03', day: '金', checkIn: '09:10', checkOut: '19:20', status: 'present' },
+      { date: '2026/04/04', day: '土', checkIn: null,    checkOut: null,    status: 'holiday' },
+      { date: '2026/04/05', day: '日', checkIn: null,    checkOut: null,    status: 'holiday' },
+      { date: '2026/04/06', day: '月', checkIn: '09:00', checkOut: '18:30', status: 'present' },
+      { date: '2026/04/07', day: '火', checkIn: '09:05', checkOut: '18:10', status: 'present' },
+      { date: '2026/04/08', day: '水', checkIn: null,    checkOut: null,    status: 'absent'  },
+      { date: '2026/04/09', day: '木', checkIn: '08:55', checkOut: '17:45', status: 'present' },
+      { date: '2026/04/10', day: '金', checkIn: null,    checkOut: null,    status: 'today'   },
+    ];
+
+    const STATUS_LABELS = {
+      present: { label: '出勤',   cls: 'badge-present' },
+      absent:  { label: '欠勤',   cls: 'badge-absent'  },
+      holiday: { label: '休日',   cls: 'badge-holiday' },
+      today:   { label: '本日',   cls: 'badge-today'   },
+    };
+
+    // ===== Login コンポーネント =====
+    function LoginPage({ onLogin }) {
+      const [id, setId]       = useState('');
+      const [pass, setPass]   = useState('');
+      const [error, setError] = useState('');
+
+      function handleSubmit(e) {
+        e.preventDefault();
+        if (id === FIXED_ID && pass === FIXED_PASS) {
+          onLogin(id);
+        } else {
+          setError('IDまたはパスワードが正しくありません');
+        }
+      }
+
+      return (
+        <div className="login-wrapper">
+          <h1>🕐 勤怠管理</h1>
+          <p className="subtitle">IDとパスワードを入力してください</p>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>社員ID</label>
+              <input
+                type="text"
+                placeholder="user01"
+                value={id}
+                onChange={e => { setId(e.target.value); setError(''); }}
+                autoFocus
+              />
+            </div>
+            <div className="form-group">
+              <label>パスワード</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={pass}
+                onChange={e => { setPass(e.target.value); setError(''); }}
+              />
+            </div>
+            {error && <p className="error-msg">{error}</p>}
+            <button type="submit" className="btn-primary">ログイン</button>
+          </form>
+          <p className="hint">ID: user01 / PASS: pass1234</p>
+        </div>
+      );
+    }
+
+    // ===== Dashboard コンポーネント =====
+    function Dashboard({ userId, onLogout }) {
+      const [records, setRecords] = useState(initialAttendance);
+
+      const todayIdx  = records.findIndex(r => r.status === 'today');
+      const todayRec  = records[todayIdx];
+
+      function handleCheckIn() {
+        const t = nowJST();
+        setRecords(prev => prev.map((r, i) =>
+          i === todayIdx ? { ...r, checkIn: t, status: 'today' } : r
+        ));
+      }
+
+      function handleCheckOut() {
+        const t = nowJST();
+        setRecords(prev => prev.map((r, i) =>
+          i === todayIdx ? { ...r, checkOut: t, status: 'today' } : r
+        ));
+      }
+
+      const canCheckIn  = todayRec && !todayRec.checkIn;
+      const canCheckOut = todayRec && !!todayRec.checkIn && !todayRec.checkOut;
+
+      return (
+        <div className="dashboard">
+          {/* トップバー */}
+          <div className="top-bar">
+            <span className="brand">🕐 勤怠管理システム</span>
+            <span className="user-info">ログイン中: {userId}</span>
+            <button className="btn-logout" onClick={onLogout}>ログアウト</button>
+          </div>
+
+          {/* 打刻カード */}
+          <div className="stamp-card">
+            <div>
+              <div className="today-label">本日</div>
+              <div className="today-date">2026年4月10日（金）</div>
+            </div>
+            <div className="stamp-times">
+              <div className="stamp-time-block">
+                <div className="label">出勤</div>
+                <div className={`time-val ${todayRec?.checkIn ? '' : 'empty'}`}>
+                  {todayRec?.checkIn || '--:--'}
+                </div>
+              </div>
+              <div className="stamp-time-block">
+                <div className="label">退勤</div>
+                <div className={`time-val ${todayRec?.checkOut ? '' : 'empty'}`}>
+                  {todayRec?.checkOut || '--:--'}
+                </div>
+              </div>
+              {todayRec?.checkIn && todayRec?.checkOut && (
+                <div className="stamp-time-block">
+                  <div className="label">勤務時間</div>
+                  <div className="time-val hours-cell">
+                    {calcHours(todayRec.checkIn, todayRec.checkOut) || '-'}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="stamp-buttons">
+              <button
+                className="btn-checkin"
+                onClick={handleCheckIn}
+                disabled={!canCheckIn}
+              >
+                出勤打刻
+              </button>
+              <button
+                className="btn-checkout"
+                onClick={handleCheckOut}
+                disabled={!canCheckOut}
+              >
+                退勤打刻
+              </button>
+            </div>
+          </div>
+
+          {/* 打刻一覧テーブル */}
+          <div className="table-card">
+            <h2>2026年4月 出退勤記録</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>曜日</th>
+                  <th>出勤</th>
+                  <th>退勤</th>
+                  <th>勤務時間</th>
+                  <th>状態</th>
+                </tr>
+              </thead>
+              <tbody>
+                {records.map((r, i) => {
+                  const isToday = r.status === 'today';
+                  const hours   = calcHours(r.checkIn, r.checkOut);
+                  const badge   = STATUS_LABELS[r.status];
+                  return (
+                    <tr key={r.date} className={isToday ? 'today-row' : ''}>
+                      <td>{r.date}</td>
+                      <td>{r.day}</td>
+                      <td>{r.checkIn  || <span style={{color:'#ccc'}}>--:--</span>}</td>
+                      <td>{r.checkOut || <span style={{color:'#ccc'}}>--:--</span>}</td>
+                      <td className={hours ? 'hours-cell' : ''}>{hours || '-'}</td>
+                      <td>
+                        <span className={`badge ${badge.cls}`}>{badge.label}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ===== App =====
+    function App() {
+      const [loggedInUser, setLoggedInUser] = useState(null);
+
+      return loggedInUser
+        ? <Dashboard userId={loggedInUser} onLogout={() => setLoggedInUser(null)} />
+        : <LoginPage onLogin={setLoggedInUser} />;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
