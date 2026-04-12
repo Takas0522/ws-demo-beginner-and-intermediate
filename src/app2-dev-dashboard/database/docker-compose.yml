@@ -1,0 +1,25 @@
+name: app2-dev-dashboard
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: app2-dev-dashboard-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: app2_dev_dashboard
+      POSTGRES_USER: app2user
+      POSTGRES_PASSWORD: app2password
+    ports:
+      - "5434:5432"
+    volumes:
+      - app2_pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app2user -d app2_dev_dashboard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  app2_pgdata:
