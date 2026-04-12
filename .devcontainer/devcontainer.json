@@ -1,34 +1,42 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
-	"name": "Debian",
+	"name": "Debian (.NET + Node.js + Docker)",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:debian",
 	"features": {
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/azure-cli:1": {}
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/devcontainers/features/dotnet:2": {
+			"version": "10.0"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "22"
+		},
+		// .NET Aspire の AppHost がホスト Docker デーモンでコンテナを起動できるようにする
+		// moby は Debian trixie で非対応のため false に設定
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"moby": false
+		}
 	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"marp-team.marp-vscode",
-				"ms-toolsai.jupyter"
+				"ms-toolsai.jupyter",
+				"ms-dotnettools.csdevkit",
+				"ms-dotnettools.csharp",
+				"ms-dotnettools.vscode-dotnet-runtime",
+				"esbenp.prettier-vscode",
+				"dbaeumer.vscode-eslint",
+				// Docker コンテナ管理
+				"ms-azuretools.vscode-docker"
 			]
 		}
-	}
+	},
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
-
-	// Configure tool-specific properties.
-	// "customizations": {},
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	// ダッシュボードアプリ用ポート / Aspire Dashboard ポート
+	"forwardPorts": [5000, 5001, 3000, 18888, 18889]
 }
