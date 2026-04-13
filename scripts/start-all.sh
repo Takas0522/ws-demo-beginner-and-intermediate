@@ -57,10 +57,32 @@ docker compose -f "${REPO_ROOT}/src/app2-dev-dashboard/database/docker-compose.y
 echo "      DB の準備待ち (10秒)..."
 sleep 10
 
-# Auth DB スキーマ・シード適用
-echo "      Auth DB スキーマ/シード適用..."
-docker exec -i auth-service-db psql -U authuser -d auth_service < "${REPO_ROOT}/src/auth-service/database/schema.sql" 2>/dev/null || true
-docker exec -i auth-service-db psql -U authuser -d auth_service < "${REPO_ROOT}/src/auth-service/database/seed.sql"   2>/dev/null || true
+# ── スキーマ・シード適用 (docker-entrypoint-initdb.d が機能しない環境でも確実に適用) ──
+echo "      スキーマ/シード適用中..."
+
+# Auth DB
+docker exec -i auth-service-db psql -U authuser -d auth_service \
+  < "${REPO_ROOT}/src/auth-service/database/schema.sql" 2>/dev/null || true
+docker exec -i auth-service-db psql -U authuser -d auth_service \
+  < "${REPO_ROOT}/src/auth-service/database/seed.sql"   2>/dev/null || true
+
+# App1 DB
+CONTAINER_APP1=$(docker ps --filter "name=app1-service-dashboard-db" --format "{{.Names}}" | head -1)
+if [ -n "${CONTAINER_APP1}" ]; then
+  docker exec -i "${CONTAINER_APP1}" psql -U app1user -d app1_service_dashboard \
+    < "${REPO_ROOT}/src/app1-service-dashboard/database/schema.sql" 2>/dev/null || true
+  docker exec -i "${CONTAINER_APP1}" psql -U app1user -d app1_service_dashboard \
+    < "${REPO_ROOT}/src/app1-service-dashboard/database/seed.sql"   2>/dev/null || true
+fi
+
+# App2 DB
+CONTAINER_APP2=$(docker ps --filter "name=app2-dev-dashboard-db" --format "{{.Names}}" | head -1)
+if [ -n "${CONTAINER_APP2}" ]; then
+  docker exec -i "${CONTAINER_APP2}" psql -U app2user -d app2_dev_dashboard \
+    < "${REPO_ROOT}/src/app2-dev-dashboard/database/schema.sql" 2>/dev/null || true
+  docker exec -i "${CONTAINER_APP2}" psql -U app2user -d app2_dev_dashboard \
+    < "${REPO_ROOT}/src/app2-dev-dashboard/database/seed.sql"   2>/dev/null || true
+fi
 
 # ── バックエンド ビルド ────────────────────────────────────────────────────────
 echo "[2/6] バックエンドをビルド中..."
