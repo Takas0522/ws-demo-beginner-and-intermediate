@@ -1,33 +1,37 @@
 # サービス & 開発状況ダッシュボード
 
-2つのダッシュボードアプリを含むモノレポです。
+2つのダッシュボードアプリと共通認証サービスを含むモノレポです。
 
 ## アプリケーション構成
 
-| | App1: サービスダッシュボード | App2: 開発状況ダッシュボード |
-|---|---|---|
-| **概要** | 販売サービスのKPI管理 | チケット・PR・開発進捗管理 |
-| **Frontend** | http://localhost:3001 | http://localhost:3002 |
-| **Backend API** | http://localhost:5001 | http://localhost:5002 |
-| **Swagger UI** | http://localhost:5001/swagger | http://localhost:5002/swagger |
-| **PostgreSQL** | localhost:5433 | localhost:5434 |
+| | Auth Service | App1: サービスダッシュボード | App2: 開発状況ダッシュボード |
+|---|---|---|---|
+| **概要** | 共通JWT認証基盤 | 販売サービスのKPI管理 | チケット・PR・開発進捗管理 |
+| **Frontend** | — | http://localhost:3001 | http://localhost:3002 |
+| **Backend API** | http://localhost:5000 | http://localhost:5001 | http://localhost:5002 |
+| **Swagger UI** | http://localhost:5000/swagger | http://localhost:5001/swagger | http://localhost:5002/swagger |
+| **PostgreSQL** | localhost:5435 | localhost:5433 | localhost:5434 |
 
 ## ディレクトリ構成
 
 ```
 src/
+├── auth-service/
+│   ├── backend/AuthService/   # ASP.NET Core 10 WebAPI (JWT発行・検証)
+│   └── database/              # PostgreSQL (docker-compose + schema/seed SQL)
 ├── app1-service-dashboard/
-│   ├── frontend/          # React + Vite + Tailwind CSS v4
-│   ├── backend/App1Backend/  # ASP.NET Core 10 WebAPI
-│   └── database/          # PostgreSQL (docker-compose + schema/seed SQL)
+│   ├── frontend/              # React + Vite + Tailwind CSS v4
+│   ├── backend/App1Backend/   # ASP.NET Core 10 WebAPI
+│   └── database/              # PostgreSQL (docker-compose + schema/seed SQL)
 ├── app2-dev-dashboard/
-│   ├── frontend/          # React + Vite + Tailwind CSS v4
-│   ├── backend/App2Backend/  # ASP.NET Core 10 WebAPI
-│   └── database/          # PostgreSQL (docker-compose + schema/seed SQL)
-└── aspire-host/           # .NET Aspire AppHost (Aspireワークロード利用時)
-docs/                      # 機能要件・データモデル仕様
+│   ├── frontend/              # React + Vite + Tailwind CSS v4
+│   ├── backend/App2Backend/   # ASP.NET Core 10 WebAPI
+│   └── database/              # PostgreSQL (docker-compose + schema/seed SQL)
+└── aspire-host/               # .NET Aspire AppHost (Aspireワークロード利用時)
+docs/                          # 機能要件・データモデル仕様
 scripts/
-└── start-all.sh           # 全アプリ一括起動スクリプト
+├── start-all.sh               # 全アプリ一括起動スクリプト
+└── stop-all.sh                # 全アプリ一括停止スクリプト
 ```
 
 ## クイックスタート
@@ -44,11 +48,44 @@ scripts/
 ./scripts/start-all.sh
 ```
 
-起動順序: PostgreSQL → バックエンド → フロントエンド
+起動順序: PostgreSQL (全3DB) → Auth Service → App1/App2 バックエンド → フロントエンド
 
-Ctrl+C で全プロセスを停止します。
+Ctrl+C で全プロセスを停止します。別ウィンドウから止める場合:
+
+```bash
+./scripts/stop-all.sh
+```
+
+### 認証について
+
+全ページへのアクセスにはログインが必要です。ログインページでユーザー名とパスワードを入力するとJWTが発行され、以降のAPIリクエストに自動付与されます。
+
+**テスト用アカウント**
+
+| ユーザー名 | パスワード | 権限 | 所属部門 |
+|---|---|---|---|
+| `admin` | `password123` | Admin | — |
+| `tanaka` | `password123` | User | ITソリューション事業部 |
+| `sato` | `password123` | User | フィンテックサービス事業部 |
+| `yamada` | `password123` | User | ヘルスケアデジタル事業部 |
+| `suzuki` | `password123` | User | エデュケーションテック事業部 |
+
+（他 4名も同パスワードでログイン可能）
 
 ### 個別起動
+
+#### Auth Service
+
+```bash
+cd src/auth-service/database
+docker compose up -d
+# 初回のみ: スキーマ・シードデータ投入
+docker exec -i auth-service-db psql -U authuser -d auth_service < schema.sql
+docker exec -i auth-service-db psql -U authuser -d auth_service < seed.sql
+
+cd ../backend/AuthService
+dotnet run
+```
 
 #### App1 データベース
 
@@ -83,6 +120,7 @@ App2 も同様の手順で起動できます（ポートは 5434/5002/3002）。
 |---|---|
 | フロントエンド | React 18, TypeScript, Vite, Tailwind CSS v4, Recharts, TanStack Query |
 | バックエンド | ASP.NET Core 10 WebAPI, Entity Framework Core 9, CsvHelper |
+| 認証 | JWT Bearer (共有シークレット方式), BCrypt.Net |
 | データベース | PostgreSQL 16 |
 | オーケストレーション | .NET Aspire (オプション) |
 
