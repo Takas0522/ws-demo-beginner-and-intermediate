@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { getPullRequest, exportUrl } from '../api/client'
+import { getPullRequest, downloadCsv } from '../api/client'
 
 export default function PullRequestDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -36,10 +36,10 @@ export default function PullRequestDetailPage() {
           </div>
           <h2 className="text-xl font-bold text-gray-800">{data.title}</h2>
         </div>
-        <a href={exportUrl('pull-requests')}
+        <button onClick={() => downloadCsv('pull-requests', 'pull-requests.csv')}
           className="text-sm bg-slate-600 text-white px-3 py-1.5 rounded hover:bg-slate-700">
           CSV エクスポート
-        </a>
+        </button>
       </div>
 
       {/* 基本情報 */}

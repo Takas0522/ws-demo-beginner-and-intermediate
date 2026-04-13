@@ -53,6 +53,20 @@ export const getAbTestDetail = (id: string) =>
   api.get(`/ab-tests/${id}`).then(r => r.data)
 
 // ─── Export ───────────────────────────────────────────────────────────────────
+export const downloadCsv = async (path: string, filename: string, params?: Record<string, unknown>) => {
+  const res = await api.get(`/export/${path}`, {
+    params,
+    responseType: 'blob',
+  })
+  const url = URL.createObjectURL(new Blob([res.data], { type: 'text/csv' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+/** @deprecated JWT認証追加後は downloadCsv を使用してください */
 export const exportUrl = (path: string, params?: Record<string, unknown>) => {
   const url = new URL(`/api/export/${path}`, window.location.origin)
   if (params) {

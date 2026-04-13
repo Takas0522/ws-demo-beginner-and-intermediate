@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getSummary, exportUrl } from '../api/client'
+import { getSummary, downloadCsv } from '../api/client'
 import KpiCard from '../components/KpiCard'
 import {
   BarChart, Bar, PieChart, Pie, Cell,
@@ -24,12 +24,12 @@ export default function SummaryPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-800">全社 KPI サマリー</h2>
-        <a
-          href={exportUrl('kpi-summary')}
+        <button
+          onClick={() => downloadCsv('kpi-summary', 'kpi-summary.csv')}
           className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700"
         >
           CSV エクスポート
-        </a>
+        </button>
       </div>
 
       {/* KPIカード */}

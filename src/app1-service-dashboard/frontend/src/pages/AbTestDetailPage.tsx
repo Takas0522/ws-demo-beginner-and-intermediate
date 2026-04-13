@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { getAbTestDetail, exportUrl } from '../api/client'
+import { getAbTestDetail, downloadCsv } from '../api/client'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ReferenceLine, ResponsiveContainer
 } from 'recharts'
@@ -38,9 +38,9 @@ export default function AbTestDetailPage() {
           <h2 className="text-xl font-bold text-gray-800">{data.name}</h2>
           <p className="text-sm text-gray-500 mt-1">{data.description}</p>
         </div>
-        <a href={exportUrl('ab-tests')} className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700">
+        <button onClick={() => downloadCsv('ab-tests', 'ab-tests.csv')} className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700">
           CSV エクスポート
-        </a>
+        </button>
       </div>
 
       {/* メタ情報 */}

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { getServiceDetail, exportUrl } from '../api/client'
+import { getServiceDetail, downloadCsv } from '../api/client'
 import KpiCard from '../components/KpiCard'
 import {
   LineChart, Line, BarChart, Bar,
@@ -28,10 +28,10 @@ export default function ServiceDetailPage() {
           <p className="text-sm text-gray-500 mt-1">{data.description}</p>
         </div>
         <div className="flex gap-2">
-          <a href={exportUrl('service-detail', { serviceIds: id })}
+          <button onClick={() => downloadCsv('user-metrics', 'user-metrics.csv', { serviceIds: id })}
             className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700">
             CSV エクスポート
-          </a>
+          </button>
         </div>
       </div>
 

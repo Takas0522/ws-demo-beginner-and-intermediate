@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { getProjectDetail, getProjectSprints, getProjectTickets, exportUrl } from '../api/client'
+import { getProjectDetail, getProjectSprints, getProjectTickets, downloadCsv } from '../api/client'
 import KpiCard from '../components/KpiCard'
 import {
   LineChart, Line, BarChart, Bar,
@@ -55,10 +55,10 @@ export default function ProjectDetailPage() {
           <h2 className="text-xl font-bold text-gray-800">{data.name}</h2>
           <p className="text-sm text-gray-500 mt-1">{data.description}</p>
         </div>
-        <a href={exportUrl('project-summary')}
+        <button onClick={() => downloadCsv('project-summary', 'project-summary.csv')}
           className="text-sm bg-slate-600 text-white px-3 py-1.5 rounded hover:bg-slate-700">
           CSV エクスポート
-        </a>
+        </button>
       </div>
 
       {/* EVM KPIカード */}
