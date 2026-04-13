@@ -55,8 +55,8 @@ sleep 10
 
 # ── バックエンド ビルド ────────────────────────────────────────────────────────
 echo "[2/5] バックエンドをビルド中..."
-dotnet build "${REPO_ROOT}/src/app1-service-dashboard/backend/App1Backend" -q
-dotnet build "${REPO_ROOT}/src/app2-dev-dashboard/backend/App2Backend" -q
+dotnet build "${REPO_ROOT}/src/app1-service-dashboard/backend/App1Backend" -v:minimal 2>&1 | grep -E "^Build|error TS|error CS" || true
+dotnet build "${REPO_ROOT}/src/app2-dev-dashboard/backend/App2Backend" -v:minimal 2>&1 | grep -E "^Build|error TS|error CS" || true
 echo "      ビルド完了"
 
 # ── App1 バックエンド ─────────────────────────────────────────────────────────
