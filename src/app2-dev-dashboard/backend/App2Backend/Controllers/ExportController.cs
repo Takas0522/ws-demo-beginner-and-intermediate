@@ -42,7 +42,9 @@ public class ExportController(AppDbContext db) : ControllerBase
             {
                 ProjectId           = p.Id,
                 ProjectName         = p.Name,
+                ServiceId           = p.ServiceId,
                 Service             = p.Service.Name,
+                BusinessUnitId      = p.Service.BusinessUnitId,
                 BusinessUnit        = p.Service.BusinessUnit.Name,
                 Status              = p.Status,
                 PlannedStartDate    = p.PlannedStartDate?.ToString("yyyy-MM-dd") ?? "",
@@ -86,8 +88,11 @@ public class ExportController(AppDbContext db) : ControllerBase
         var rows = tickets.Select(t => new
         {
             TicketId         = t.Id,
+            ProjectId        = t.ProjectId,
             ProjectName      = t.Project.Name,
+            ServiceId        = t.Project.ServiceId,
             ServiceName      = t.Project.Service.Name,
+            SprintId         = t.SprintId?.ToString() ?? "",
             SprintName       = t.Sprint?.Name ?? "",
             Title            = t.Title,
             TicketType       = t.TicketType,
@@ -96,6 +101,7 @@ public class ExportController(AppDbContext db) : ControllerBase
             AssigneeId       = t.AssigneeId?.ToString() ?? "",
             AuthUserId       = t.Assignee?.AuthUserId?.ToString() ?? "",
             AssigneeName     = t.Assignee?.Name ?? "",
+            DepartmentId     = t.Assignee?.DepartmentId.ToString() ?? "",
             DepartmentName   = t.Assignee?.Department?.Name ?? "",
             StoryPoints      = t.StoryPoints?.ToString() ?? "",
             EstimatedHours   = t.EstimatedHours?.ToString() ?? "",
@@ -131,8 +137,11 @@ public class ExportController(AppDbContext db) : ControllerBase
 
             return new
             {
+                PrId         = pr.Id,
                 PrNumber     = pr.PrNumber,
+                ProjectId    = pr.ProjectId,
                 ProjectName  = pr.Project.Name,
+                ServiceId    = pr.Project.ServiceId,
                 ServiceName  = pr.Project.Service.Name,
                 Title        = pr.Title,
                 Status       = pr.Status,
@@ -175,11 +184,15 @@ public class ExportController(AppDbContext db) : ControllerBase
 
         var rows = logs.Select(w => new
         {
+            WorkLogId      = w.Id,
             MemberId       = w.MemberId,
             AuthUserId     = w.Member.AuthUserId?.ToString() ?? "",
             MemberName     = w.Member.Name,
+            DepartmentId   = w.Member.DepartmentId,
             Department     = w.Member.Department.Name,
+            ProjectId      = w.Ticket.ProjectId,
             ProjectName    = w.Ticket.Project.Name,
+            ServiceId      = w.Ticket.Project.ServiceId,
             ServiceName    = w.Ticket.Project.Service.Name,
             TicketId       = w.TicketId,
             TicketTitle    = w.Ticket.Title,

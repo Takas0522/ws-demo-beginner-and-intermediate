@@ -95,9 +95,10 @@ public class ExportController(AppDbContext db) : ControllerBase
                 {
                     TestId          = t.Id,
                     TestName        = t.Name,
+                    BusinessUnitId  = t.Service.BusinessUnitId,
+                    BusinessUnit    = t.Service.BusinessUnit.Name,
                     ServiceId       = t.ServiceId,
                     Service         = t.Service.Name,
-                    BusinessUnit    = t.Service.BusinessUnit.Name,
                     StartedAt       = t.StartedAt.ToString("yyyy-MM-dd"),
                     EndedAt         = t.EndedAt?.ToString("yyyy-MM-dd") ?? "",
                     Status          = t.Status,
@@ -137,9 +138,10 @@ public class ExportController(AppDbContext db) : ControllerBase
             .Select(u => new
             {
                 Date            = u.Date.ToString(),
+                BusinessUnitId  = u.Service.BusinessUnitId,
+                BusinessUnit    = u.Service.BusinessUnit.Name,
                 ServiceId       = u.ServiceId,
                 Service         = u.Service.Name,
-                BusinessUnit    = u.Service.BusinessUnit.Name,
                 Mau             = u.Mau,
                 Dau             = u.Dau,
                 NewUsers        = u.NewUsers,
