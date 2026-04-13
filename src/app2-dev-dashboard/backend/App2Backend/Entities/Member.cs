@@ -5,6 +5,7 @@ public class Member
     public Guid Id { get; set; }
     public Guid DepartmentId { get; set; }
     public string Name { get; set; } = string.Empty;
+    public Guid? AuthUserId { get; set; }
     public decimal? HourlyRate { get; set; }
     public string Status { get; set; } = "active";
     public DateTime CreatedAt { get; set; }

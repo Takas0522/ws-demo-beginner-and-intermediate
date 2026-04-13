@@ -154,3 +154,22 @@ CREATE TABLE ab_test_results (
     recorded_at                 TIMESTAMP      NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_results_variant_metric ON ab_test_results(variant_id, metric_name);
+
+-- ────────────────────────────────────────
+-- サービス関係者
+-- ────────────────────────────────────────
+CREATE TABLE service_stakeholders (
+    id                      UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
+    service_id              UUID          NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+    auth_user_id            UUID          NOT NULL,
+    display_name            VARCHAR(100)  NOT NULL,
+    role                    VARCHAR(20)   NOT NULL
+                            CHECK (role IN ('developer','operator','pm','pl','tl')),
+    hourly_rate             DECIMAL(10,2) NOT NULL DEFAULT 0,
+    allocated_hours_monthly DECIMAL(6,1)  NOT NULL DEFAULT 0,
+    created_at              TIMESTAMP     NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMP     NOT NULL DEFAULT now(),
+    UNIQUE (service_id, auth_user_id)
+);
+CREATE INDEX idx_stakeholders_service   ON service_stakeholders(service_id);
+CREATE INDEX idx_stakeholders_auth_user ON service_stakeholders(auth_user_id);

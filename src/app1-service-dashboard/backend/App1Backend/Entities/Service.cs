@@ -19,4 +19,5 @@ public class Service
     public ICollection<RevenueDaily> Revenues { get; set; } = [];
     public ICollection<CostDaily> Costs { get; set; } = [];
     public ICollection<AbTest> AbTests { get; set; } = [];
+    public ICollection<ServiceStakeholder> Stakeholders { get; set; } = [];
 }

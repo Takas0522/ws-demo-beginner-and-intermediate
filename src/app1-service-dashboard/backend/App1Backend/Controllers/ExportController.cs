@@ -151,6 +151,39 @@ public class ExportController(AppDbContext db) : ControllerBase
         return CsvResult(rows, $"user-metrics_{dateFrom:yyyyMMdd}-{dateTo:yyyyMMdd}.csv");
     }
 
+    [HttpGet("stakeholders")]
+    public async Task<IActionResult> ExportStakeholders(
+        [FromQuery] Guid[]? serviceIds)
+    {
+        var query = db.ServiceStakeholders
+            .Include(s => s.Service).ThenInclude(svc => svc.BusinessUnit)
+            .AsQueryable();
+
+        if (serviceIds is { Length: > 0 })
+            query = query.Where(s => serviceIds.Contains(s.ServiceId));
+
+        var rows = await query
+            .OrderBy(s => s.Service.BusinessUnit.Name)
+            .ThenBy(s => s.Service.Name)
+            .ThenBy(s => s.Role)
+            .Select(s => new
+            {
+                BusinessUnit           = s.Service.BusinessUnit.Name,
+                ServiceId              = s.ServiceId,
+                ServiceName            = s.Service.Name,
+                StakeholderId          = s.Id,
+                AuthUserId             = s.AuthUserId,
+                DisplayName            = s.DisplayName,
+                Role                   = s.Role,
+                HourlyRate             = s.HourlyRate,
+                AllocatedHoursMonthly  = s.AllocatedHoursMonthly,
+                MonthlyCost            = s.HourlyRate * s.AllocatedHoursMonthly,
+            })
+            .ToListAsync();
+
+        return CsvResult(rows, $"stakeholders_{DateTime.UtcNow:yyyyMMdd}.csv");
+    }
+
     private FileStreamResult CsvResult<T>(IEnumerable<T> rows, string filename)
     {
         var stream = new MemoryStream();

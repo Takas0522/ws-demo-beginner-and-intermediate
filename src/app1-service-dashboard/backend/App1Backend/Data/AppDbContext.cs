@@ -15,6 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<AbTest> AbTests => Set<AbTest>();
     public DbSet<AbTestVariant> AbTestVariants => Set<AbTestVariant>();
     public DbSet<AbTestResult> AbTestResults => Set<AbTestResult>();
+    public DbSet<ServiceStakeholder> ServiceStakeholders => Set<ServiceStakeholder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,5 +54,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<AbTestVariant>(e => e.ToTable("ab_test_variants"));
         modelBuilder.Entity<AbTestResult>(e => e.ToTable("ab_test_results"));
+
+        modelBuilder.Entity<ServiceStakeholder>(e =>
+        {
+            e.ToTable("service_stakeholders");
+            e.HasOne(s => s.Service).WithMany(svc => svc.Stakeholders).HasForeignKey(s => s.ServiceId);
+            e.Property(s => s.AuthUserId).HasColumnName("auth_user_id");
+            e.Property(s => s.DisplayName).HasColumnName("display_name");
+            e.Property(s => s.HourlyRate).HasColumnName("hourly_rate");
+            e.Property(s => s.AllocatedHoursMonthly).HasColumnName("allocated_hours_monthly");
+        });
     }
 }

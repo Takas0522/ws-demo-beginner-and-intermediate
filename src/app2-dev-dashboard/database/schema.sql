@@ -45,13 +45,15 @@ CREATE TABLE members (
     id            UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
     department_id UUID          NOT NULL REFERENCES departments(id),
     name          VARCHAR(100)  NOT NULL,
+    auth_user_id  UUID          NULL,       -- AuthサービスのユーザーID（紐付け任意）
     hourly_rate   DECIMAL(10,2),  -- NULL の場合は部署デフォルト適用
     status        VARCHAR(20)   NOT NULL DEFAULT 'active'
                   CHECK (status IN ('active','inactive')),
     created_at    TIMESTAMP     NOT NULL DEFAULT now(),
     updated_at    TIMESTAMP     NOT NULL DEFAULT now()
 );
-CREATE INDEX idx_members_dept ON members(department_id);
+CREATE INDEX idx_members_dept      ON members(department_id);
+CREATE INDEX idx_members_auth_user ON members(auth_user_id);
 
 -- ────────────────────────────────────────
 -- プロジェクト

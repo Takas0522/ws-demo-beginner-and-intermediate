@@ -93,6 +93,8 @@ public class ExportController(AppDbContext db) : ControllerBase
             TicketType       = t.TicketType,
             Priority         = t.Priority,
             Status           = t.Status,
+            AssigneeId       = t.AssigneeId?.ToString() ?? "",
+            AuthUserId       = t.Assignee?.AuthUserId?.ToString() ?? "",
             AssigneeName     = t.Assignee?.Name ?? "",
             DepartmentName   = t.Assignee?.Department?.Name ?? "",
             StoryPoints      = t.StoryPoints?.ToString() ?? "",
@@ -134,6 +136,8 @@ public class ExportController(AppDbContext db) : ControllerBase
                 ServiceName  = pr.Project.Service.Name,
                 Title        = pr.Title,
                 Status       = pr.Status,
+                AuthorId     = pr.AuthorId,
+                AuthUserId   = pr.Author.AuthUserId?.ToString() ?? "",
                 AuthorName   = pr.Author.Name,
                 Reviewers    = reviewers,
                 BaseBranch   = pr.BaseBranch,
@@ -172,6 +176,7 @@ public class ExportController(AppDbContext db) : ControllerBase
         var rows = logs.Select(w => new
         {
             MemberId       = w.MemberId,
+            AuthUserId     = w.Member.AuthUserId?.ToString() ?? "",
             MemberName     = w.Member.Name,
             Department     = w.Member.Department.Name,
             ProjectName    = w.Ticket.Project.Name,

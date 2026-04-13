@@ -33,10 +33,10 @@ export default function SummaryPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-800">開発状況サマリー</h2>
         <button
-          onClick={() => downloadCsv('project-summary', 'project-summary.csv')}
+          onClick={() => downloadCsv('tasks', 'tasks.csv')}
           className="text-sm bg-slate-600 text-white px-3 py-1.5 rounded hover:bg-slate-700"
         >
-          CSV エクスポート
+          チケット明細 CSV
         </button>
       </div>
 

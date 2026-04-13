@@ -71,6 +71,20 @@ CONTAINER_APP1=$(docker ps --filter "name=app1-service-dashboard-db" --format "{
 if [ -n "${CONTAINER_APP1}" ]; then
   docker exec -i "${CONTAINER_APP1}" psql -U app1user -d app1_service_dashboard \
     < "${REPO_ROOT}/src/app1-service-dashboard/database/schema.sql" 2>/dev/null || true
+  # マイグレーション（既存DBへのカラム追加）
+  docker exec -i "${CONTAINER_APP1}" psql -U app1user -d app1_service_dashboard -c \
+    "CREATE TABLE IF NOT EXISTS service_stakeholders (
+       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+       service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+       auth_user_id UUID NOT NULL,
+       display_name VARCHAR(100) NOT NULL,
+       role VARCHAR(20) NOT NULL CHECK (role IN ('developer','operator','pm','pl','tl')),
+       hourly_rate DECIMAL(10,2) NOT NULL DEFAULT 0,
+       allocated_hours_monthly DECIMAL(6,1) NOT NULL DEFAULT 0,
+       created_at TIMESTAMP NOT NULL DEFAULT now(),
+       updated_at TIMESTAMP NOT NULL DEFAULT now(),
+       UNIQUE (service_id, auth_user_id)
+     );" 2>/dev/null || true
   docker exec -i "${CONTAINER_APP1}" psql -U app1user -d app1_service_dashboard \
     < "${REPO_ROOT}/src/app1-service-dashboard/database/seed.sql"   2>/dev/null || true
 fi
@@ -80,6 +94,10 @@ CONTAINER_APP2=$(docker ps --filter "name=app2-dev-dashboard-db" --format "{{.Na
 if [ -n "${CONTAINER_APP2}" ]; then
   docker exec -i "${CONTAINER_APP2}" psql -U app2user -d app2_dev_dashboard \
     < "${REPO_ROOT}/src/app2-dev-dashboard/database/schema.sql" 2>/dev/null || true
+  # マイグレーション（既存DBへのカラム追加）
+  docker exec -i "${CONTAINER_APP2}" psql -U app2user -d app2_dev_dashboard -c \
+    "ALTER TABLE members ADD COLUMN IF NOT EXISTS auth_user_id UUID NULL;
+     CREATE INDEX IF NOT EXISTS idx_members_auth_user ON members(auth_user_id);" 2>/dev/null || true
   docker exec -i "${CONTAINER_APP2}" psql -U app2user -d app2_dev_dashboard \
     < "${REPO_ROOT}/src/app2-dev-dashboard/database/seed.sql"   2>/dev/null || true
 fi

@@ -23,7 +23,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<BusinessUnit>(e => e.ToTable("business_units"));
         modelBuilder.Entity<Service>(e => e.ToTable("services"));
         modelBuilder.Entity<Department>(e => e.ToTable("departments"));
-        modelBuilder.Entity<Member>(e => e.ToTable("members"));
+        modelBuilder.Entity<Member>(e =>
+        {
+            e.ToTable("members");
+            e.Property(m => m.AuthUserId).HasColumnName("auth_user_id");
+        });
 
         modelBuilder.Entity<Project>(e =>
         {

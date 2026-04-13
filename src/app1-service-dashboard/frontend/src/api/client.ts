@@ -45,6 +45,29 @@ export const getServices = (params?: {
 export const getServiceDetail = (id: string, range?: DateRange) =>
   api.get(`/services/${id}`, { params: range }).then(r => r.data)
 
+// ─── Stakeholders ─────────────────────────────────────────────────────────────
+export const getStakeholders = (serviceId: string) =>
+  api.get(`/services/${serviceId}/stakeholders`).then(r => r.data)
+
+export const addStakeholder = (serviceId: string, body: {
+  authUserId: string
+  displayName: string
+  role: string
+  hourlyRate: number
+  allocatedHoursMonthly: number
+}) => api.post(`/services/${serviceId}/stakeholders`, body).then(r => r.data)
+
+export const updateStakeholder = (serviceId: string, id: string, body: {
+  authUserId: string
+  displayName: string
+  role: string
+  hourlyRate: number
+  allocatedHoursMonthly: number
+}) => api.put(`/services/${serviceId}/stakeholders/${id}`, body).then(r => r.data)
+
+export const deleteStakeholder = (serviceId: string, id: string) =>
+  api.delete(`/services/${serviceId}/stakeholders/${id}`).then(r => r.data)
+
 // ─── AB Tests ─────────────────────────────────────────────────────────────────
 export const getAbTests = (serviceId: string, status?: string) =>
   api.get(`/services/${serviceId}/ab-tests`, { params: { status } }).then(r => r.data)
