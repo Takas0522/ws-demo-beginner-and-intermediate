@@ -23,6 +23,7 @@ stop_by_port() {
 }
 
 echo "[1/3] バックエンドを停止中..."
+stop_by_port 5000
 stop_by_port 5001
 stop_by_port 5002
 
@@ -32,6 +33,8 @@ stop_by_port 3002
 
 # ── Docker DB停止 ────────────────────────────────────────────────────────────
 echo "[3/3] データベースを停止中..."
+docker compose -f "${REPO_ROOT}/src/auth-service/database/docker-compose.yml" down 2>/dev/null \
+  && echo "  Auth DB 停止" || echo "  Auth DB: 既に停止済み"
 docker compose -f "${REPO_ROOT}/src/app1-service-dashboard/database/docker-compose.yml" down 2>/dev/null \
   && echo "  App1 DB 停止" || echo "  App1 DB: 既に停止済み"
 docker compose -f "${REPO_ROOT}/src/app2-dev-dashboard/database/docker-compose.yml" down 2>/dev/null \

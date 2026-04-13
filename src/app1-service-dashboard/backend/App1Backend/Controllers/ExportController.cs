@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using System.Globalization;
 using App1Backend.Data;
 using CsvHelper;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace App1Backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/export")]
 public class ExportController(AppDbContext db) : ControllerBase

@@ -1,6 +1,26 @@
 import axios from 'axios'
+import { getToken, clearAuth } from './authClient'
 
 const api = axios.create({ baseURL: '/api' })
+
+// JWT を自動付与
+api.interceptors.request.use(config => {
+  const token = getToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+// 401 → ログアウト
+api.interceptors.response.use(
+  r => r,
+  err => {
+    if (err.response?.status === 401) {
+      clearAuth()
+      window.location.href = '/login'
+    }
+    return Promise.reject(err)
+  }
+)
 
 export type DateRange = { from?: string; to?: string }
 

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using App2Backend.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace App2Backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/summary")]
 public class SummaryController(AppDbContext db) : ControllerBase

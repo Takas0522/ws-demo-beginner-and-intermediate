@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using App1Backend.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace App1Backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/business-units")]
 public class BusinessUnitsController(AppDbContext db) : ControllerBase

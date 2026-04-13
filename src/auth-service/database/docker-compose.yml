@@ -1,0 +1,22 @@
+name: auth-service
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: auth-service-db
+    environment:
+      POSTGRES_DB: auth_service
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpassword
+    ports:
+      - "5435:5432"
+    volumes:
+      - auth_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authuser -d auth_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  auth_pgdata:

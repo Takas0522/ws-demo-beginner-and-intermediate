@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using App2Backend.Data;
 using App2Backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -5,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace App2Backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/projects")]
 public class ProjectsController(AppDbContext db) : ControllerBase
