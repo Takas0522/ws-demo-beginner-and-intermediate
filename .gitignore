@@ -1,1 +1,75 @@
 /temp
+
+# ──────────────────────────────────────────
+# .NET / ASP.NET Core
+# ──────────────────────────────────────────
+bin/
+obj/
+*.user
+*.suo
+.vs/
+_ReSharper*/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+artifacts/
+
+# ──────────────────────────────────────────
+# Node.js / React / Vite
+# ──────────────────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+.cache/
+*.tsbuildinfo
+.vite/
+
+# ──────────────────────────────────────────
+# 環境変数・シークレット
+# ──────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.secrets
+appsettings.Production.json
+appsettings.Staging.json
+
+# ──────────────────────────────────────────
+# Docker / データボリューム
+# ──────────────────────────────────────────
+docker-volumes/
+postgres-data/
+
+# ──────────────────────────────────────────
+# OS / エディタ
+# ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+
+# JetBrains IDEs
+.idea/
+
+# VS Code (devcontainer は管理対象)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# ──────────────────────────────────────────
+# テスト / カバレッジ
+# ──────────────────────────────────────────
+TestResults/
+coverage/
+*.coveragexml
+
+# ──────────────────────────────────────────
+# ログ
+# ──────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
