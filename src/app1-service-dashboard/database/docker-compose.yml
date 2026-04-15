@@ -1,0 +1,23 @@
+name: app1-service-dashboard
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: app1-service-dashboard-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: app1_service_dashboard
+      POSTGRES_USER: app1user
+      POSTGRES_PASSWORD: app1password
+    ports:
+      - "5433:5432"
+    volumes:
+      - app1_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app1user -d app1_service_dashboard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  app1_pgdata:
