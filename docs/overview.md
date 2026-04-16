@@ -52,7 +52,7 @@
 ## ディレクトリ構成
 
 ```
-src/
+target-app/
 ├── app1-service-dashboard/
 │   ├── frontend/          # React アプリ
 │   ├── backend/           # ASP.NET Core WebAPI
@@ -71,7 +71,7 @@ src/
 Aspire AppHost を使用して全アプリを一括起動します。
 
 ```bash
-cd src/aspire-host
+cd target-app/aspire-host
 dotnet run
 ```
 

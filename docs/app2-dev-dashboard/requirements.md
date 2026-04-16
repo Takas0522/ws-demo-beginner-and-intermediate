@@ -213,11 +213,11 @@ App1（サービスダッシュボード）で扱う各電子サービスの開�
 
 ```bash
 # Frontend
-cd src/app2-dev-dashboard/frontend && npm run dev
+cd target-app/app2-dev-dashboard/frontend && npm run dev
 
 # Backend
-cd src/app2-dev-dashboard/backend && dotnet run
+cd target-app/app2-dev-dashboard/backend && dotnet run
 
 # Database (Docker)
-docker compose -f src/app2-dev-dashboard/database/docker-compose.yml up -d
+docker compose -f target-app/app2-dev-dashboard/database/docker-compose.yml up -d
 ```

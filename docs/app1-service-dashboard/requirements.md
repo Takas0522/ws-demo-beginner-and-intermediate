@@ -169,11 +169,11 @@
 
 ```bash
 # Frontend
-cd src/app1-service-dashboard/frontend && npm run dev
+cd target-app/app1-service-dashboard/frontend && npm run dev
 
 # Backend
-cd src/app1-service-dashboard/backend && dotnet run
+cd target-app/app1-service-dashboard/backend && dotnet run
 
 # Database (Docker)
-docker compose -f src/app1-service-dashboard/database/docker-compose.yml up -d
+docker compose -f target-app/app1-service-dashboard/database/docker-compose.yml up -d
 ```
