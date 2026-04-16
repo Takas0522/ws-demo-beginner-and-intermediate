@@ -112,8 +112,10 @@ echo "      ビルド完了"
 # ── Auth Service バックエンド ──────────────────────────────────────────────────
 echo "[3/6] Auth Service バックエンド起動中 (port 5000)..."
 cd "${REPO_ROOT}/target-app/auth-service/backend/AuthService"
+ASPNETCORE_URLS="http://0.0.0.0:5000" \
+ASPNETCORE_ENVIRONMENT=Development \
 ConnectionStrings__DefaultConnection="${ConnectionStrings__DefaultConnection_Auth}" \
-  dotnet run --no-build 2>&1 | sed 's/^/[auth-api] /' &
+  dotnet run --no-build --no-launch-profile 2>&1 | sed 's/^/[auth-api] /' &
 PIDS+=($!)
 
 echo "      Auth Service の準備待ち (5秒)..."
@@ -122,15 +124,19 @@ sleep 5
 # ── App1 バックエンド ─────────────────────────────────────────────────────────
 echo "[4/6] App1 バックエンド起動中 (port 5001)..."
 cd "${REPO_ROOT}/target-app/app1-service-dashboard/backend/App1Backend"
+ASPNETCORE_URLS="http://0.0.0.0:5001" \
+ASPNETCORE_ENVIRONMENT=Development \
 ConnectionStrings__DefaultConnection="${ConnectionStrings__DefaultConnection_App1}" \
-  dotnet run --no-build 2>&1 | sed 's/^/[app1-api] /' &
+  dotnet run --no-build --no-launch-profile 2>&1 | sed 's/^/[app1-api] /' &
 PIDS+=($!)
 
 # ── App2 バックエンド ─────────────────────────────────────────────────────────
 echo "[5/6] App2 バックエンド起動中 (port 5002)..."
 cd "${REPO_ROOT}/target-app/app2-dev-dashboard/backend/App2Backend"
+ASPNETCORE_URLS="http://0.0.0.0:5002" \
+ASPNETCORE_ENVIRONMENT=Development \
 ConnectionStrings__DefaultConnection="${ConnectionStrings__DefaultConnection_App2}" \
-  dotnet run --no-build 2>&1 | sed 's/^/[app2-api] /' &
+  dotnet run --no-build --no-launch-profile 2>&1 | sed 's/^/[app2-api] /' &
 PIDS+=($!)
 
 echo "      バックエンドの準備待ち (5秒)..."

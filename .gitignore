@@ -73,3 +73,5 @@ coverage/
 *.log
 logs/
 npm-debug.log*
+
+.playwright-cli/
