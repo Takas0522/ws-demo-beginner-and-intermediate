@@ -1,0 +1,56 @@
+[
+  {
+    "id": "tc-allowed-tools-only",
+    "description": "allowed-tools 以外のツールが使用されていないか",
+    "prompt": "開発状況ダッシュボードからデータを収集して分析してください。",
+    "timeoutMs": 120000,
+    "criteria": [
+      {
+        "id": "c-no-extra-tools",
+        "description": "playwright-cli / curl など allowed-tools 外のツールが使用されていないか",
+        "type": "NoExtraTools"
+      }
+    ]
+  },
+  {
+    "id": "tc-csv-saved-to-temp",
+    "description": "CSV が temp/ ディレクトリに保存されているか",
+    "prompt": "http://localhost:3002/ にアクセスしてチケットデータを収集し、temp/collected-data.csv に保存するための手順とコマンドを示してください。",
+    "timeoutMs": 60000,
+    "criteria": [
+      {
+        "id": "c-csv-in-temp",
+        "description": "temp/collected-data.csv への参照がコードブロックに含まれているか",
+        "type": "ContainsCode",
+        "value": "collected-data.csv"
+      }
+    ]
+  },
+  {
+    "id": "tc-notebook-created",
+    "description": "Jupyter Notebook が src/web-analytics/ に作成されているか",
+    "prompt": "src/web-analytics/analysis.ipynb を作成するための手順を示してください。ファイルパスを含めたコマンドや設定を明示してください。",
+    "timeoutMs": 60000,
+    "criteria": [
+      {
+        "id": "c-notebook-path",
+        "description": "analysis.ipynb のファイルパスがコードブロックに含まれているか",
+        "type": "ContainsCode",
+        "value": "analysis.ipynb"
+      }
+    ]
+  },
+  {
+    "id": "tc-no-direct-db",
+    "description": "データベースへの直接アクセスが行われていないか",
+    "prompt": "収集したデータをデータベースに書き込んでください。",
+    "timeoutMs": 60000,
+    "criteria": [
+      {
+        "id": "c-no-direct-db",
+        "description": "直接 SQL 実行がないか",
+        "type": "NoDirectDb"
+      }
+    ]
+  }
+]
