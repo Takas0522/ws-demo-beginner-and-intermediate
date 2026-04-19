@@ -158,6 +158,26 @@ public sealed class SkillTestHarness : IAsyncDisposable
             "使用ツール: playwright-cli, uv";
     }
 
+    private static string GetCsvImporterMockResponse()
+    {
+        return
+            "# タスク完了: csv-importer\n\n" +
+            "バックエンドの起動を確認し、POST /api/tickets/import でCSVをインポートしました。\n\n" +
+            "```bash\n" +
+            "curl -sf http://localhost:5001/api/health && echo \"✅ バックエンド起動中\"\n" +
+            "```\n\n" +
+            "```bash\n" +
+            "RESPONSE=$(curl -sf -X POST http://localhost:5001/api/tickets/import)\n" +
+            "echo \"$RESPONSE\"\n" +
+            "```\n\n" +
+            "レスポンス:\n\n" +
+            "```json\n" +
+            "{ \"message\": \"Import complete\", \"imported\": 1339, \"skipped\": 0, \"total\": 1339 }\n" +
+            "```\n\n" +
+            "✅ CSV インポート完了 — 1339 件インポート / 合計 1339 件\n\n" +
+            "使用ツール: curl";
+    }
+
     private static string GenerateMockResponse(ParsedSkill skill)
     {
         // スキル固有のモックレスポンスを返す
@@ -165,6 +185,8 @@ public sealed class SkillTestHarness : IAsyncDisposable
             return GetWebAnalyticsMockResponse();
         if (skill.Metadata.Name == "bad-analytics")
             return GetBadAnalyticsMockResponse();
+        if (skill.Metadata.Name == "csv-importer")
+            return GetCsvImporterMockResponse();
 
         var name = skill.Metadata.Name;
         var tools = string.Join(", ", skill.Metadata.AllowedTools.DefaultIfEmpty("(none)"));
