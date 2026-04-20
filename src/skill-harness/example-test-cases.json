@@ -1,0 +1,34 @@
+[
+  {
+    "id": "tc-basic",
+    "description": "基本的なタスクが実行できるか",
+    "prompt": "スキルの指示に従って基本的なタスクを実行してください。",
+    "timeoutMs": 60000,
+    "criteria": [
+      {
+        "id": "c-output",
+        "description": "レスポンスが空でないか",
+        "type": "OutputContains",
+        "expected": "完了"
+      },
+      {
+        "id": "c-code",
+        "description": "コードブロックが含まれるか",
+        "type": "ContainsCode"
+      }
+    ]
+  },
+  {
+    "id": "tc-tools",
+    "description": "許可外のツールが使われていないか",
+    "prompt": "スキルの指示に従ってデータを収集してください。",
+    "timeoutMs": 90000,
+    "criteria": [
+      {
+        "id": "c-no-extra-tools",
+        "description": "AllowedTools 以外のツールが使用されていないか",
+        "type": "NoExtraTools"
+      }
+    ]
+  }
+]

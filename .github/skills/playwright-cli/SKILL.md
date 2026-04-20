@@ -4,13 +4,17 @@ description: Automate browser interactions, test web pages and work with Playwri
 allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 ---
 
+# 全般
+
+デモとして動作している様子を参照する必要があるため、`--headed` オプションを付けてブラウザを起動してください。
+
 # Browser Automation with playwright-cli
 
 ## Quick start
 
 ```bash
 # open new browser
-playwright-cli open
+playwright-cli open --headed
 # navigate to a page
 playwright-cli goto https://playwright.dev
 # interact with the page using refs from the snapshot
@@ -28,7 +32,7 @@ playwright-cli close
 ### Core
 
 ```bash
-playwright-cli open
+playwright-cli open --headed
 # open and navigate right away
 playwright-cli open https://example.com/
 playwright-cli goto https://playwright.dev
@@ -190,13 +194,6 @@ playwright-cli open --profile=/path/to/profile
 
 # Connect to browser via extension
 playwright-cli attach --extension
-
-# Connect to a running Chrome or Edge by channel name
-playwright-cli attach --cdp=chrome
-playwright-cli attach --cdp=msedge
-
-# Connect to a running browser via CDP endpoint
-playwright-cli attach --cdp=http://localhost:9222
 
 # Start with config file
 playwright-cli open --config=my-config.json

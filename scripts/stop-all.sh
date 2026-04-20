@@ -33,11 +33,11 @@ stop_by_port 3002
 
 # ── Docker DB停止 ────────────────────────────────────────────────────────────
 echo "[3/3] データベースを停止中..."
-docker compose -f "${REPO_ROOT}/src/auth-service/database/docker-compose.yml" down 2>/dev/null \
+docker compose -f "${REPO_ROOT}/target-app/auth-service/database/docker-compose.yml" down 2>/dev/null \
   && echo "  Auth DB 停止" || echo "  Auth DB: 既に停止済み"
-docker compose -f "${REPO_ROOT}/src/app1-service-dashboard/database/docker-compose.yml" down 2>/dev/null \
+docker compose -f "${REPO_ROOT}/target-app/app1-service-dashboard/database/docker-compose.yml" down 2>/dev/null \
   && echo "  App1 DB 停止" || echo "  App1 DB: 既に停止済み"
-docker compose -f "${REPO_ROOT}/src/app2-dev-dashboard/database/docker-compose.yml" down 2>/dev/null \
+docker compose -f "${REPO_ROOT}/target-app/app2-dev-dashboard/database/docker-compose.yml" down 2>/dev/null \
   && echo "  App2 DB 停止" || echo "  App2 DB: 既に停止済み"
 
 echo ""

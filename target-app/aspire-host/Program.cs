@@ -16,7 +16,7 @@ var app1Backend = builder
     .WaitFor(app1Db);
 
 var app1Frontend = builder
-    .AddNpmApp("app1-frontend", "../../src/app1-service-dashboard/frontend", "dev")
+    .AddNpmApp("app1-frontend", "../../target-app/app1-service-dashboard/frontend", "dev")
     .WithHttpEndpoint(port: 3001, env: "PORT")
     .WithReference(app1Backend)
     .WaitFor(app1Backend);
@@ -35,7 +35,7 @@ var app2Backend = builder
     .WaitFor(app2Db);
 
 var app2Frontend = builder
-    .AddNpmApp("app2-frontend", "../../src/app2-dev-dashboard/frontend", "dev")
+    .AddNpmApp("app2-frontend", "../../target-app/app2-dev-dashboard/frontend", "dev")
     .WithHttpEndpoint(port: 3002, env: "PORT")
     .WithReference(app2Backend)
     .WaitFor(app2Backend);

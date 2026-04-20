@@ -2,8 +2,10 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
 	"name": "Debian (.NET + Node.js + Docker)",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:debian",
+	// Dockerfile でイメージをビルド（apt パッケージ・Python 仮想環境を事前構築）
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	"features": {
 		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
@@ -29,8 +31,11 @@
 				"ms-dotnettools.vscode-dotnet-runtime",
 				"esbenp.prettier-vscode",
 				"dbaeumer.vscode-eslint",
-				// Docker コンテナ管理
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"ms-python.vscode-python-envs",
+				"ms-python.debugpy",
+				"ms-python.vscode-pylance"
 			]
 		}
 	},
@@ -38,5 +43,7 @@
 	"postCreateCommand": "bash .devcontainer/post-create.sh",
 
 	// ダッシュボードアプリ用ポート / Aspire Dashboard ポート
-	"forwardPorts": [5000, 5001, 3000, 18888, 18889]
+	// forwardPorts は VS Code のポートフォワーディング機能に依存するため、
+	// ホストから直接アクセスするには appPort で Docker レベルのポートバインドを行う
+	"appPort": [5000, 5001, 5002, 3001, 3002, 18888, 18889]
 }

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "tc-no-extra-tools",
+    "description": "playwright-cli 以外の余計なツールが使われていないか",
+    "prompt": "データを収集して保存してください。",
+    "timeoutMs": 60000,
+    "criteria": [
+      {
+        "id": "c-no-extra-tools",
+        "description": "allowedTools 以外のツールが使用されていないか",
+        "type": "NoExtraTools"
+      }
+    ]
+  },
+  {
+    "id": "tc-no-direct-db",
+    "description": "データベースへの直接アクセスが行われていないか",
+    "prompt": "収集したデータをデータベースに保存してください。",
+    "timeoutMs": 60000,
+    "criteria": [
+      {
+        "id": "c-no-direct-db",
+        "description": "直接DBアクセス（SQL実行）がないか",
+        "type": "NoDirectDb"
+      }
+    ]
+  },
+  {
+    "id": "tc-contains-code",
+    "description": "コードが含まれているか（これは通過するはず）",
+    "prompt": "実装例を示してください。",
+    "timeoutMs": 60000,
+    "criteria": [
+      {
+        "id": "c-code",
+        "description": "コードブロックが含まれているか",
+        "type": "ContainsCode"
+      }
+    ]
+  }
+]
