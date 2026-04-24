@@ -6,15 +6,13 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 
 # 全般
 
-デモとして動作している様子を参照する必要があるため、`--headed` オプションを付けてブラウザを起動してください。
-
 # Browser Automation with playwright-cli
 
 ## Quick start
 
 ```bash
 # open new browser
-playwright-cli open --headed
+playwright-cli open
 # navigate to a page
 playwright-cli goto https://playwright.dev
 # interact with the page using refs from the snapshot
@@ -32,7 +30,7 @@ playwright-cli close
 ### Core
 
 ```bash
-playwright-cli open --headed
+playwright-cli open
 # open and navigate right away
 playwright-cli open https://example.com/
 playwright-cli goto https://playwright.dev
@@ -346,3 +344,4 @@ playwright-cli close
 * **Tracing** [references/tracing.md](references/tracing.md)
 * **Video recording** [references/video-recording.md](references/video-recording.md)
 * **Inspecting element attributes** [references/element-attributes.md](references/element-attributes.md)
+ 

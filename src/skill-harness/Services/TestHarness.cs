@@ -133,49 +133,73 @@ public sealed class SkillTestHarness : IAsyncDisposable
     {
         return
             "# タスク完了: web-analytics\n\n" +
-            "playwright-cli を使ってデータを収集し、temp/collected-data.csv に保存しました。\n\n" +
+            "## Step 1: データ収集チェック\n\n" +
+            "temp/collected-data.csv が存在しないため、データ収集を開始します。\n" +
+            "すでに存在する場合はスキップします。\n\n" +
             "```bash\n" +
-            "playwright-cli open --headed http://localhost:3002/\n" +
-            "playwright-cli snapshot\n" +
-            "playwright-cli click e12\n" +
+            "node .github/skills/web-analytics/collect-data.js\n" +
+            "```\n\n" +
+            "playwright-cli でログインし、KPI データをエクスポートしました。\n\n" +
+            "```bash\n" +
+            "playwright-cli open http://localhost:3001/login\n" +
+            "playwright-cli fill e10 \"admin\"\n" +
+            "playwright-cli fill e13 \"password123\"\n" +
+            "playwright-cli click e14\n" +
             "playwright-cli close\n" +
             "```\n\n" +
-            "次に uv プロジェクトを作成し analysis.ipynb を構築しました。\n\n" +
-            "```bash\n" +
-            "uv init src/web-analysis\n" +
-            "cd src/web-analysis && uv add pandas matplotlib seaborn japanize-matplotlib ipykernel\n" +
-            "```\n\n" +
+            "## Step 2: CSV 保存\n\n" +
+            "5,521 件のレコードを temp/collected-data.csv に保存しました。\n\n" +
+            "## Step 3: Jupyter Notebook 構築\n\n" +
+            "src/kpi-analysis/kpi_analysis.ipynb を作成し、以下の分析を実施しました。\n\n" +
             "```python\n" +
             "import pandas as pd\n" +
             "import matplotlib.pyplot as plt\n" +
-            "import japanize_matplotlib\n\n" +
+            "import matplotlib_fontja\n\n" +
             "df = pd.read_csv('../../temp/collected-data.csv')\n" +
-            "df['Status'].value_counts().plot(kind='bar')\n" +
-            "plt.title('ステータス別チケット数')\n" +
-            "plt.savefig('status_distribution.png', dpi=150)\n" +
+            "df['Date'] = pd.to_datetime(df['Date'])\n" +
+            "df['YearMonth'] = df['Date'].dt.to_period('M')\n\n" +
+            "monthly = df.groupby('YearMonth')['Revenue'].sum()\n" +
+            "monthly.plot(kind='bar')\n" +
+            "plt.title('月次売上推移')\n" +
+            "plt.savefig('src/kpi-analysis/01_revenue.png', dpi=120)\n" +
             "plt.show()\n" +
             "```\n\n" +
-            "使用ツール: playwright-cli, uv";
+            "## Step 4: クリーンアップ\n\n" +
+            "分析完了後、収集データを削除しました。\n\n" +
+            "```bash\n" +
+            "rm temp/collected-data.csv\n" +
+            "```\n\n" +
+            "✓ 完了: src/kpi-analysis/kpi_analysis.ipynb を作成しました。\n\n" +
+            "使用ツール: playwright-cli, node";
     }
 
     private static string GetCsvImporterMockResponse()
     {
         return
             "# タスク完了: csv-importer\n\n" +
-            "バックエンドの起動を確認し、POST /api/tickets/import でCSVをインポートしました。\n\n" +
+            "## Step 1: CSV ファイルの読み込み\n\n" +
+            "temp/collected-data.csv を読み込みました。\n\n" +
+            "## Step 2: API へのインポートリクエスト\n\n" +
+            "POST /api/v1/import エンドポイントに curl でリクエストを送信しました。\n\n" +
             "```bash\n" +
-            "curl -sf http://localhost:5001/api/health && echo \"✅ バックエンド起動中\"\n" +
-            "```\n\n" +
-            "```bash\n" +
-            "RESPONSE=$(curl -sf -X POST http://localhost:5001/api/tickets/import)\n" +
+            "CSV_CONTENT=$(cat \"temp/collected-data.csv\")\n" +
+            "RESPONSE=$(curl -s -X POST http://localhost:5000/api/v1/import \\\n" +
+            "  -H \"Content-Type: application/json\" \\\n" +
+            "  -d \"{\\\"csvContent\\\": $(echo \\\"$CSV_CONTENT\\\" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')}\")\n" +
             "echo \"$RESPONSE\"\n" +
             "```\n\n" +
+            "## Step 3: 結果の報告\n\n" +
             "レスポンス:\n\n" +
             "```json\n" +
-            "{ \"message\": \"Import complete\", \"imported\": 1339, \"skipped\": 0, \"total\": 1339 }\n" +
+            "{ \"data\": { \"rowCount\": 120, \"buIds\": [\"BU001\"], \"message\": \"120 件を取り込みました\" } }\n" +
             "```\n\n" +
-            "✅ CSV インポート完了 — 1339 件インポート / 合計 1339 件\n\n" +
-            "使用ツール: curl";
+            "| 項目 | 値 |\n" +
+            "|------|-----|\n" +
+            "| success | true |\n" +
+            "| count | 120 |\n" +
+            "| message | 120 件を取り込みました |\n\n" +
+            "ファイルが見つかりません の場合は success: false、count: 0 を報告します。\n\n" +
+            "使用ツール: ReadFile, curl";
     }
 
     private static string GenerateMockResponse(ParsedSkill skill)
